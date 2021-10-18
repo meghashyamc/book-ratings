@@ -10,7 +10,7 @@ import (
 
 func makeHttpReq(requestMap map[string]string) (*http.Response, error) {
 
-	request, err := http.NewRequest(requestMap[reqType], url, nil)
+	request, err := http.NewRequest(requestMap[reqType], requestMap[url], nil)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err":             err.Error(),
