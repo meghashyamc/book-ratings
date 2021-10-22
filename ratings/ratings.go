@@ -10,6 +10,7 @@ func GetAllRatings(book string) (map[string]float32, error) {
 			return nil, err
 		}
 		ratings[site] = rating
+
 	}
 	return ratings, nil
 }

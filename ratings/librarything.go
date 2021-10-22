@@ -1,9 +1,7 @@
 package ratings
 
 import (
-	"encoding/json"
 	"encoding/xml"
-	"errors"
 	"net/http"
 	"os"
 	"strings"
@@ -14,64 +12,30 @@ import (
 
 func GetLibraryThingRating(book string) (float32, error) {
 
-	requestMap := map[string]string{reqType: http.MethodGet, url: os.Getenv("BING_URL"), paramKey: "q", paramVal: book + " book librarything", headerKey: os.Getenv("BING_TOKEN_FIELD"), headerVal: os.Getenv("BING_TOKEN")}
-	// searching for the book on Bing
-	response, err := makeHttpReq(requestMap)
+	res, err := getBookDetailsFromSearch(book, libraryThing)
 	if err != nil {
 		return 0.0, err
 	}
 
-	content, err := readResponseAndCheckStatusCode(response, requestMap)
-	if err != nil {
-		return 0.0, err
-	}
-	bingObj := models.BingAnswer{}
-
-	err = json.Unmarshal(content, &bingObj)
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err":           err.Error(),
-			"response_body": content,
-		}).Error("Could not unmarshal response received from Bing(for Library Thing)")
-
-		return 0.0, err
-	}
-
-	// first URL result in Bing
-	libraryThingUrlBing := bingObj.WebPages.Value[0].URL
-
-	// getting Library Thing number for the book
-
-	slashIndex := strings.LastIndex(libraryThingUrlBing, "/")
-
-	if slashIndex == -1 {
-		err := errors.New("Could not get Library Thing book number from Bing search")
-		log.WithFields(log.Fields{
-			"err":           err.Error(),
-			"response_body": content,
-		}).Error("Could not fetch Library Thing book number")
-
-		return 0.0, err
-	}
-
-	bookNum := libraryThingUrlBing[slashIndex+1:]
+	resURLParts := strings.Split(res.FormattedUrl, "/")
+	libraryThingIndex := resURLParts[len(resURLParts)-1]
 
 	// contact library thing with the book number
-	libraryThingUrl := os.Getenv("LIBRARY_THING_URL") + os.Getenv("LIBRARY_THING_KEY") + "&id=" + bookNum
-	response, err = http.Get(libraryThingUrl)
+	libraryThingURL := os.Getenv("LIBRARY_THING_URL") + os.Getenv("LIBRARY_THING_KEY") + "&id=" + libraryThingIndex
+	response, err := http.Get(libraryThingURL)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
-			"url": libraryThingUrl,
+			"url": libraryThingURL,
 		}).Error("Got an error when calling Library Thing URL")
 
 		return 0.0, err
 	}
 
-	content, err = readResponseAndCheckStatusCode(response, nil)
-	libObj := models.LibraryThingResponse{}
+	content, err := readResponseAndCheckStatusCode(response, nil)
+	libraryThingResponse := models.LibraryThingResponse{}
 
-	if err = xml.Unmarshal(content, &libObj); err != nil {
+	if err = xml.Unmarshal(content, &libraryThingResponse); err != nil {
 		log.WithFields(log.Fields{
 			"err":           err.Error(),
 			"response_body": content,
@@ -80,5 +44,5 @@ func GetLibraryThingRating(book string) (float32, error) {
 		return 0.0, err
 	}
 
-	return libObj.Ltml.Item.Rating / 2, nil
+	return libraryThingResponse.Ltml.Item.Rating / 2, nil
 }

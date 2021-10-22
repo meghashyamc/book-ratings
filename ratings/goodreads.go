@@ -1,9 +1,8 @@
 package ratings
 
 import (
-	"encoding/xml"
-	"net/http"
-	"os"
+	"encoding/json"
+	"strconv"
 
 	"github.com/meghashyamc/book-ratings/models"
 	log "github.com/sirupsen/logrus"
@@ -11,26 +10,30 @@ import (
 
 func GetGoodreadsRating(book string) (float32, error) {
 
-	requestMap := map[string]string{reqType: http.MethodGet, url: os.Getenv("GOODREADS_URL") + os.Getenv("GOODREADS_KEY"), paramKey: "q", paramVal: book}
-	response, err := makeHttpReq(requestMap)
+	res, err := getBookDetailsFromSearch(book, goodreads)
 	if err != nil {
 		return 0.0, err
 	}
-	content, err := readResponseAndCheckStatusCode(response, requestMap)
-	if err != nil {
-		return 0.0, err
-	}
-	goodreadsObj := models.GoodreadsResponse{}
-
-	if err = xml.Unmarshal(content, &goodreadsObj); err != nil {
+	goodreadsPageMap := models.GoodreadsPageMap{}
+	if err := json.Unmarshal(res.Pagemap, &goodreadsPageMap); err != nil {
 		log.WithFields(log.Fields{
-			"err":           err.Error(),
-			"response_body": content,
-		}).Error("Could not unmarshal XML response received from Goodreads")
-
+			"err":  err.Error(),
+			"book": book,
+			"site": goodreads,
+		}).Error("Got an error when unmarshaling search result to read Goodreads rating")
 		return 0.0, err
 	}
 
-	return goodreadsObj.Search.Results.Works[0].AverageRating, nil
+	goodreadsRating, err := strconv.ParseFloat(goodreadsPageMap.Review[0].RatingStars, 32)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err":  err.Error(),
+			"book": book,
+			"site": goodreads,
+		}).Error("Could not convert Goodreads rating to a number")
+		return 0.0, err
+
+	}
+	return float32(goodreadsRating), nil
 
 }
