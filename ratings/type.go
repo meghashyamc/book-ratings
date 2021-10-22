@@ -12,6 +12,7 @@ const (
 )
 
 var (
-	ratingFuncs              = map[string](func(book string) (float32, error)){libraryThing: GetLibraryThingRating, goodreads: GetGoodreadsRating}
-	searchIDEnvVariableNames = map[string]string{libraryThing: "LIBRARY_THING_SEARCH_ID", goodreads: "GOODREADS_SEARCH_ID"}
+	ratingFuncs               = map[string](func(book string) (float32, error)){libraryThing: GetLibraryThingRating, goodreads: GetGoodreadsRating}
+	searchIDEnvVariableNames  = map[string]string{libraryThing: "LIBRARY_THING_SEARCH_ID", goodreads: "GOODREADS_SEARCH_ID"}
+	libraryThingResponseClass = ".work_hint"
 )
