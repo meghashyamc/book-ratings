@@ -1,6 +1,6 @@
 # book-ratings
 Shows Goodreads and Library Thing ratings of a book in the terminal
 
-Note1: appropriate Google Search and Library Thing keys and environment variables must be set (as shown in env.sample) for the program to work. Will add more details about this once I test it more.
+Note: A Google Search API key and a search ID for a programmable custom search engine for Goodreads and Library Thing are required for the program to work.
+More details: https://developers.google.com/custom-search/v1/introduction and as mentioned in env.sample.
 
-Note2: WIP as of now. Will remove this line once done.
