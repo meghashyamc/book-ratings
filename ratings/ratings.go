@@ -1,5 +1,7 @@
 package ratings
 
+import "fmt"
+
 func GetAllRatings(book string) (map[string]float32, error) {
 
 	ratings := map[string]float32{}
@@ -7,7 +9,8 @@ func GetAllRatings(book string) (map[string]float32, error) {
 
 		rating, err := ratingFunc(book)
 		if err != nil {
-			return nil, err
+			fmt.Println("Could not get", site, "rating")
+			continue
 		}
 		ratings[site] = rating
 
