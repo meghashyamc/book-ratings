@@ -25,8 +25,9 @@ func GetLibraryThingRating(book string) (float32, error) {
 	response, err := http.Get(libraryThingURL)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"err": err.Error(),
-			"url": libraryThingURL,
+			"err":                 err.Error(),
+			"library_thing_index": libraryThingIndex,
+			"url":                 libraryThingURL,
 		}).Error("Got an error when calling Library Thing URL")
 
 		return 0.0, err
@@ -37,8 +38,10 @@ func GetLibraryThingRating(book string) (float32, error) {
 
 	if err = xml.Unmarshal(content, &libraryThingResponse); err != nil {
 		log.WithFields(log.Fields{
-			"err":           err.Error(),
-			"response_body": content,
+			"err":                 err.Error(),
+			"url":                 libraryThingURL,
+			"library_thing_index": libraryThingIndex,
+			"response_body":       content,
 		}).Error("Could not unmarshal XML response received from Library Thing")
 
 		return 0.0, err

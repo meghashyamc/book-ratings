@@ -21,8 +21,8 @@ func getBookDetailsFromSearch(book, site string) (*search.Result, error) {
 		return nil, err
 	}
 
-	searchID, ok := searchIDsForSites[site]
-	if !ok {
+	searchID := os.Getenv(searchIDEnvVariableNames[site])
+	if searchID == "" {
 		log.WithFields(log.Fields{
 			"book": book,
 			"site": site,
