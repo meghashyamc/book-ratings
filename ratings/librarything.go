@@ -11,6 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const scheme = "https"
+
 func GetLibraryThingRating(book string) (float32, error) {
 
 	res, err := getBookDetailsFromSearch(book, libraryThing)
@@ -18,7 +20,7 @@ func GetLibraryThingRating(book string) (float32, error) {
 		return 0.0, err
 	}
 	libraryThingURL := res.FormattedUrl
-	response, err := http.Get(libraryThingURL)
+	response, err := http.Get(scheme + "://" + libraryThingURL)
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
