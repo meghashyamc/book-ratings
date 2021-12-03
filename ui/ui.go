@@ -8,10 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func ShowWelcome() {
-	fmt.Println("Welcome to 'Book Ratings'")
+const initFailedErr = "could not initialize UI"
 
-}
+func drawWelcomeScreen()
 
 func InputBookName() (string, error) {
 	reader := bufio.NewReader(os.Stdin)
@@ -20,7 +19,7 @@ func InputBookName() (string, error) {
 	if err != nil {
 		log.WithFields(log.Fields{
 			"err": err.Error(),
-		}).Error("Error in reading book name (input)")
+		}).Error("could not read book name (input)")
 		return "", err
 	}
 	return bookName, nil
